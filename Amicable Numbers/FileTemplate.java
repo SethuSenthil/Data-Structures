@@ -45,6 +45,9 @@ public class FileTemplate {
             }else{
               result = result.substring(0, result.length() - 1) + " and " + num.get(i); //remove oxford comma
             }
+
+            if(result.indexOf("1, and") != -1)  //removes oxford comma if factors less than 3 numbers
+            result = result.replace("1, and", "1 and");
         }
         return result;
     }
