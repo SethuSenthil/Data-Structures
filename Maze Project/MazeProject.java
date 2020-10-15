@@ -38,8 +38,8 @@ public class MazeProject extends JPanel implements KeyListener {
 
            while((text = input.readLine()) != null)
            {
-            int height = 100;
-            int width = 100;
+            int height = 50;
+            int width = 50;
             for(char c : text.toCharArray()) {
 
                System.out.print(c);
@@ -51,6 +51,9 @@ public class MazeProject extends JPanel implements KeyListener {
                    g2.setColor(new Color(20,30,0));
 
                  g2.fillRect(xMap, yMap, height, width);
+
+                 g2.setColor(Color.white);
+                 g2.drawRect(xMap, yMap, width, height);
                xMap += width;
 
             }
@@ -82,21 +85,27 @@ public class MazeProject extends JPanel implements KeyListener {
         //up = 39
         int possibleX = x;
         int possibleY = y;
+        int blockSize = 50;
 
          if(e.getKeyCode() == 38)
-         possibleY -= 10;
+         possibleY -= blockSize;
         if(e.getKeyCode() == 37)
-        possibleX -= 10;
+        possibleX -= blockSize;
         if(e.getKeyCode() == 39)
-        possibleX += 10;
+        possibleX += blockSize;
           if(e.getKeyCode() == 40)
-          possibleY += 10;
+          possibleY += blockSize;
+
 
           if(frame.getWidth() >= possibleX && frame.getHeight() >= possibleY){ //check if its outta bounds
-             /*if(possibleX){  //check if its in moviable space (not walls)
+            System.out.println(possibleX + ","+ possibleY);
+             if(possibleX < frame.getWidth() && possibleY < frame.getHeight()){
+                x = possibleX;
+                y = possibleY;
 
-             }*/
+             }
           }
+
 
         //left = 37
         //right = 39
