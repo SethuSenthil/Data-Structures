@@ -1,80 +1,86 @@
 import java.io.*;
-import java.util.ArrayList;
 
 public class FileTemplate {
+    static String projectName = "Sprial";
 
     public FileTemplate() {
         File fileName = new File("example.txt");
 
         try {
-            //read file
+            // read file
             BufferedReader input = new BufferedReader(new FileReader(fileName));
             String text;
 
-            //parse file
-            while((text=input.readLine()) != null){
+            // parse file
+            while ((text = input.readLine()) != null) {
 
-                int spiralNum = Integer.parseInt(text);
-                //System.out.println(spiralNum);
-                String[][] grid = new String[spiralNum][spiralNum];
+                // init vars
+                System.out.println("SprialNum: " + text);
+                int sprilNum = Integer.parseInt(text);
+                String[][] grid = new String[sprilNum][sprilNum];
 
+                int sRow = 0;
+                int sCol = sRow;
 
-                 for (int i = 0; i < grid.length; i++) {
-                     for (int j = 0; j < grid[i].length; j++) {
-                         grid[i][j] = "-";
-                     }
-                 }
+                int eRow = sprilNum - 1;
+                int eCol = eRow;
 
-                 int startRow = 0;
-                 int startCol = 0;
-                 int endRow = Integer.parseInt(text) - 1;
-                 int endCol = Integer.parseInt(text) - 1;
+                try {
+                    // calc loops
+                    for (int i = 0; i < grid.length; i++)
+                        for (int j = 0; j < grid[0].length; j++)
+                            grid[i][j] = "-";
 
-                 while(startRow  <= endRow && startCol <= endCol){
-
-                    //right
-                     for(int c = startCol; c <= endCol; c++){
-                        grid[startRow][c] = "*";
-                     }
-
-                     startRow++;
-
-                     //down
-
-                     for(int r = startRow; r <= endRow; r++){
-                         grid[r][endCol] = "*";
-                     }
-                     endCol -= 2;
-
-                     for(int c = endCol; c >= startCol; c--){
-                         grid[endRow][c] = "*";
-                     }
-
-                     for(int r = endRow; r >= startRow; r--){
-                         grid[r][startCol] = "*";
-                     }
-
-                    startCol += 2;
+                    while (sRow <= eRow && sCol <= eCol) {
+                        for (int col = sCol; col <= eCol; col++)
+                            grid[sRow][col] = "*";
+                        sRow++;
 
 
+                        if (sCol > 0)
+                            sCol++;
 
-                 }
+                        for (int row = sRow; row <= eRow; row++)
+                            grid[row][eCol] = "*";
+                        eCol--;
+                        sRow++;
 
-                 for (int i = 0; i < grid.length; i++) {
-                    for (int j = 0; j < grid[i].length; j++) {
-                       System.out.print(grid[i][j]);
+
+                        for (int col = eCol; col >= sCol; col--)
+                            grid[eRow][col] = "*";
+                        eRow--;
+                        eCol--;
+
+
+                        for (int row = eRow; row >= sRow; row--)
+                            grid[row][sCol] = "*";
+                        sCol++;
+                        eRow--;
+
                     }
-                    System.out.println();
-                }
 
+                    if (sprilNum % 4 == 2)
+                        grid[sprilNum / 2][(sprilNum / 2) - 1] = "-";
+
+                    // print results
+                    for (int i = 0; i < grid.length; i++) {
+                        for (int j = 0; j < grid[0].length; j++)
+                            System.out.print(grid[i][j] + " ");
+                        System.out.println();
+                    }
+
+                } catch (NumberFormatException err) {
+                    System.out.println(err);
+                }
             }
 
         } catch (IOException e) {
             System.out.println("File Not Found");
         }
     }
-    public static void main(String[] args){
-        System.out.println("Running...");
+
+    public static void main(String[] args) {
+        System.out.println("Running " + projectName + " entry point...");
         FileTemplate app = new FileTemplate();
     }
 }

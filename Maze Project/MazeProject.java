@@ -2,11 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
 
 public class MazeProject extends JPanel implements KeyListener {
     JFrame frame;
     int x;
     int y;
+    ArrayList<Integer> pathwaysX
+    = new ArrayList<Integer>();
+    ArrayList<Integer> pathwaysY
+    = new ArrayList<Integer>();
     public MazeProject(){
         x = 0;
         y = 0;
@@ -44,8 +49,11 @@ public class MazeProject extends JPanel implements KeyListener {
 
                System.out.print(c);
 
-               if(c == '*')
+               if(c == '*'){
                    g2.setColor(new Color(120,180,0));
+                   pathwaysX.add(xMap);
+                   pathwaysY.add(yMap);
+               }
 
                    if(c == '#')
                    g2.setColor(new Color(20,30,0));
@@ -68,7 +76,7 @@ public class MazeProject extends JPanel implements KeyListener {
        }
 
        g2.setColor(new Color(120,180,0));
-       g2.fillOval(x, y, 30, 30);
+       g2.drawRect(x, y, 50, 50);
        g2.setColor(Color.MAGENTA);
        g2.setStroke(new BasicStroke(5));
        g2.drawOval(x, y, 30, 30);
@@ -100,11 +108,16 @@ public class MazeProject extends JPanel implements KeyListener {
           if(frame.getWidth() >= possibleX && frame.getHeight() >= possibleY){ //check if its outta bounds
             System.out.println(possibleX + ","+ possibleY);
              if(possibleX < frame.getWidth() && possibleY < frame.getHeight()){
+
+               if(pathwaysX.indexOf(possibleX) != -1 && pathwaysY.indexOf(possibleY) != -1){
                 x = possibleX;
                 y = possibleY;
+               }
 
              }
           }
+
+          //if(e.keyCode() == 32){}
 
 
         //left = 37
