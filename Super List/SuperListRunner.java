@@ -1,103 +1,134 @@
-import java.util.*;
-public class SuperListRunner
-{
+//custom SuperList default superlist is (2)
+public class SuperListRunner {
+	public SuperListRunner() {
+		SuperList<Integer> list = new SuperList<Integer>();
+		for (int i = 0; i < 30; i++)
+			list.add((int) (Math.random() * 1000) + 1);
 
-	public SuperListRunner()
-	{
-		//This is to test your code. If it works, you should get my answers!
-		Queue<Integer> stack=new LinkedList<Integer>();
-		System.out.println(stack.poll());
-		SuperList<Integer> list=new SuperList<Integer>();
-		list.add(0, 10);
-		list.add(0,5);
-		list.add(list.size()-1,8);
-		list.add(1,12);
-		list.add(0, 20);
-		list.add(0, 25);
-		list.add(4,100);
-		list.add(0,0);
-		list.add(list.size()-1,1000);	//Should put 1000 in front of 25 (which had been the end)
-		list.add(list.size(),555);	//should make 555 the last number in the list (the end)
-		System.out.println("Size: "+list.size());
-		System.out.println("List: "+list);
+		System.out.println("List:\n" + list);
+		System.out.println("Size of the List: " + list.size());
 
-		System.out.println("Get tests: ");
-		System.out.println("index 0: "+list.get(0));
-		System.out.println("index 3: "+list.get(3));
-		System.out.println("Peek (queue): "+list.peekQueue());
-		System.out.println("Peek (stack): "+list.peekStack());
+		SuperList<Integer> stack = new SuperList<Integer>();
+		for (int i = 0; i < list.size(); i++) {
+			stack.push(list.remove(i));
+			i--;
+		}
 
+		System.out.println("\nStack:\n" + stack);
 
-		System.out.println("\nRemove tests: ");
-		System.out.println("Remove index 2: "+list.remove(2));
-		System.out.println("Remove index 3: "+list.remove(3));
-		System.out.println("Remove index 0: "+list.remove(0));
-		System.out.println("Remove index list.size()-1: "+list.remove(list.size()-1));
+		SuperList<Integer> queue = new SuperList<Integer>();
+		while (!stack.isEmpty())
+			queue.add(stack.pop());
 
+		System.out.println("\nQueue:\n" + queue);
+		while (!queue.isEmpty()) {
+			int index = (int) (Math.random() * list.size());
+			list.add(index, queue.poll());
+		}
 
-		System.out.println("\nRemove values at indexes 2, 3, 0, and then size()-1 respectively.");
-		System.out.println("\tList: "+list);
+		System.out.println("\nList:\n" + list);
+		int sum = 0;
 
+		for (int i = 0; i < list.size(); i++)
+			sum += list.get(i);
+		System.out.println("Sum of the list: " + sum);
 
-		System.out.println("Pop and Poll tests: ");
-		System.out.println("Popped: "+list.pop());
-		System.out.println("Polled: "+list.poll());
-		System.out.println("Pop a value and then poll a value.");
-		System.out.println("\tList: "+list);
+		int numEvenSum = 0;
+		for (int i = 0; i < list.size(); i += 2)
+			numEvenSum += list.get(i);
+		System.out.println("Sum of even indexes: " + numEvenSum);
 
-		System.out.println("\nContains Test:");
-		System.out.println("\tContains 4: "+list.contains(4));
-		System.out.println("\tContains 20: "+list.contains(20));
+		int numOddSum = 0;
+		for (int i = 1; i < list.size(); i += 2)
+			numOddSum += list.get(i);
+		System.out.println("Sum of odd indexes: " + numOddSum);
 
-		System.out.println("\nHere is the list, \"unstacked\": ");
-		SuperList<Integer> tempList=new SuperList<Integer>();
-		String output="[";
-		while(!list.isEmpty())
-		{
-			int num=list.pop();
-			output+=num;
-			if(list.peekStack()!=null)
-				output+=", ";
-			tempList.add(0, num);
+		for (int i = 0; i < 30; i++)
+			if (list.get(i) % 2 == 0)
+				list.add(list.size() - 1, list.get(i));
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i) % 3 == 0) {
+				list.remove(i);
+				i--;
+			}
+		}
+
+		list.add(4, 5555);
+
+		for (int i = 1; i < list.size(); i++) {
+			int valueTosort = list.get(i);
+			int j = i;
+			while (j > 0 && list.get(j - 1) > valueTosort) {
+				list.remove(j);
+				list.add(j, list.get(j - 1));
+				j--;
+			}
+
+			list.remove(j);
+			list.add(j, valueTosort);
 
 		}
-		output+="]";
-		list=tempList;
-		System.out.println("Stack: "+output);
 
-		System.out.println("\nnHere is the list, \"unqueued\": ");
-		SuperList<Integer> tempListQ=new SuperList<Integer>();
-		output="[";
-		while(!list.isEmpty())
-		{
-			int num=list.poll();
-			output+=num;
-			if(list.peekQueue()!=null)
-				output+=", ";
-			tempListQ.push(num);
+		System.out.println("\nList:\n" + list);
+		int median = 0;
+		int index = list.size() / 2;
 
+		if (list.size() % 2 != 0)
+			median = list.get(index);
+		else {
+			median = list.get(index) + list.get(index - 1);
+			median /= 2;
 		}
-		output+="]";
-		list=tempListQ;
-		System.out.println("Queue: "+output);
 
+		System.out.println("The median is: " + median);
 
+		if (list.size() % 2 != 0)
+			System.out.println("Value before the median: " + list.get(index - 1) + "\nValue after the median: "
+					+ list.get(index + 1));
+		else
+			System.out.println(
+					"Value before the median: " + list.get(index - 1) + "\nValue after the median: " + list.get(index));
 
-		System.out.println();
-		list.clear();
-		System.out.println("\nClear List!");
-			System.out.println("\tList: "+list);
+		SuperList<String> stringList = new SuperList<String>();
+		String sentence = "The greatest glory in living lies not in never falling but in rising every time we fall";
+		String[] piece = sentence.split(" ");
 
+		for (int i = 0; i < piece.length; i++)
+			stringList.add(piece[i]);
 
-		SuperList<String> stringList=new SuperList<String>();
-		stringList.add(0, "St1");
-		stringList.add(0, "St2");
-		stringList.add(0, "St3");
-		System.out.println("String List: "+stringList);
+		for (int i = 0; i < stringList.size(); i++) {
+			if (stringList.get(i).length() <= 3) {
+				stringList.remove(i);
+				i--;
+			}
+		}
+
+		String temp;
+		for (int i = 1; i < stringList.size(); i++) {
+			temp = stringList.get(i);
+			int j = 0;
+			for (j = i; j > 0; j--)
+				if (temp.compareTo(stringList.get(j - 1)) < 0) {
+					stringList.remove(j);
+					stringList.add(j, stringList.get(j - 1));
+				} else
+					break;
+			stringList.remove(j);
+			stringList.add(j, temp);
+		}
+
+		System.out.println("\nString:\n" + stringList);
+		double avgWordLength = 0.0;
+
+		for (int i = 0; i < stringList.size(); i++)
+			avgWordLength += stringList.get(i).length();
+		avgWordLength /= stringList.size();
+
+		System.out.println("Average word length: " + avgWordLength);
 	}
-	public static void main(String[] args)
-	{
-		SuperListRunner app=new SuperListRunner();
-	}
 
+	public static void main(String[] args) {
+		SuperListRunner thread = new SuperListRunner();
+	}
 }
