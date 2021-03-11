@@ -14,17 +14,26 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
     boolean firstClick;
     int numMines;
 
-    ImageIcon mine;
+    ImageIcon mineIcon;
     GraphicsEnvironment ge;
     Font mineFont;
 
     public Minesweeper() {
-        numMines = 10;
+        try {
+            ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            mineFont = Font.createFont(Font.TRUETYPE_FONT, new File("mine-sweeper.ttf"));
+            ge.registerFont(mineFont);
+        } catch (IOException | FontFormatException er) {
+        }
+        numMines = 8;
         firstClick = true;
         createBoard(10, 20);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
+
+        mineIcon = new ImageIcon("mine.png");
+        mineIcon = new ImageIcon(mineIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH));
     }
 
     public void createBoard(int r, int c) {
@@ -39,6 +48,7 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
                 board[row][col].putClientProperty("row", row);
                 board[row][col].putClientProperty("col", col);
                 board[row][col].putClientProperty("state", 0);
+                board[row][col].setFont(mineFont.deriveFont(12f));
                 board[row][col].setBorder(BorderFactory.createBevelBorder(0));
                 board[row][col].setFocusPainted(false);
                 board[row][col].addMouseListener(this);
@@ -55,16 +65,6 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         int r = (int) (btn.getClientProperty("row"));
         int c = (int) (btn.getClientProperty("col"));
 
-        try{
-            ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            mineFont = Font.createFont(Font.TRUETYPE_FONT, new File("mine-sweeper.ttf"));
-            ge.registerFont(mineFont);
-        }catch{
-
-        }
-
-
-
         if (e.getButton() == MouseEvent.BUTTON1) { // Left Click'
             board[r][c].setBackground(Color.LIGHT_GRAY);
             board[r][c].setOpaque(true);
@@ -74,7 +74,9 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
             }
 
             int state = (int) board[r][c].getClientProperty("state");
+            write(r, c, state);
             if (state == -1) {
+                board[r][c].setIcon(mineIcon);
                 JOptionPane.showMessageDialog(null, "Your a loser!");
                 // board[row][col].setBackground(Color.RED)
                 // flip over the mine location
@@ -105,9 +107,7 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         case 8:
             color = Color.GRAY;
         }
-        if (state == -1) {
-            // board[r][c].setIcon(mineIcon);
-        }
+
         if (state > 0) {
             board[r][c].setForeground(color);
             board[r][c].setText("" + state);
