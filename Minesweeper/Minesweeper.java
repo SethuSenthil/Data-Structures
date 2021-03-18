@@ -1,133 +1,295 @@
-import javax.swing.*;
+
+//TODO: ADD FACE ICONS IN BUTTON
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
-import java.awt.image.*;
-import java.io.*;
+import java.util.Timer;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+
+import java.util.TimerTask;
 
 public class Minesweeper extends JFrame implements ActionListener, MouseListener {
-    JPanel boardPanel;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     JToggleButton[][] board;
-    boolean firstClick;
+    JPanel boardPanel;
+    JPanel rootPanel;
+    ImageIcon image1, image2, image3, image4, image5, image6, image7, image8, image_mine, image_flag;
+    boolean firstClick = true;
     int numMines;
-
-    ImageIcon mineIcon;
+    boolean endGame = false;
+    int timePassed;
+    JTextField statLabel;
+    Timer timer;
     GraphicsEnvironment ge;
     Font mineFont;
+    public String timeField;
 
     public Minesweeper() {
+        numMines = 10;
         try {
             ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            mineFont = Font.createFont(Font.TRUETYPE_FONT, new File("mine-sweeper.ttf"));
-            ge.registerFont(mineFont);
-        } catch (IOException | FontFormatException er) {
+            try {
+
+                mineFont = Font.createFont(Font.TRUETYPE_FONT, new File("mine-sweeper.ttf"));
+            } catch (FontFormatException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
         }
-        numMines = 8;
-        firstClick = true;
-        createBoard(10, 20);
+
+        // TODO: Forloop it
+        image1 = new ImageIcon("1.png");
+        image1 = new ImageIcon(image1.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image2 = new ImageIcon("2.png");
+        image2 = new ImageIcon(image2.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image3 = new ImageIcon("3.png");
+        image3 = new ImageIcon(image3.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image4 = new ImageIcon("4.png");
+        image4 = new ImageIcon(image4.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image5 = new ImageIcon("5.png");
+        image5 = new ImageIcon(image5.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image6 = new ImageIcon("6.png");
+        image6 = new ImageIcon(image6.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image7 = new ImageIcon("7.png");
+        image7 = new ImageIcon(image7.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image8 = new ImageIcon("8.png");
+        image8 = new ImageIcon(image8.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image_mine = new ImageIcon("mine.png");
+        image_mine = new ImageIcon(image_mine.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        image_flag = new ImageIcon("flag.png");
+        image_flag = new ImageIcon(image_flag.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
+
+        createBoard(10, 10);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-
-        mineIcon = new ImageIcon("mine.png");
-        mineIcon = new ImageIcon(mineIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH));
     }
 
-    public void createBoard(int r, int c) {
+    public void createBoard(int row, int col) {
         if (boardPanel != null)
             this.remove(boardPanel);
         boardPanel = new JPanel();
-        board = new JToggleButton[r][c];
-        boardPanel.setLayout(new GridLayout(r, c));
-        for (int row = 0; row < r; row++) {
-            for (int col = 0; col < c; col++) {
-                board[row][col] = new JToggleButton();
-                board[row][col].putClientProperty("row", row);
-                board[row][col].putClientProperty("col", col);
-                board[row][col].putClientProperty("state", 0);
-                board[row][col].setFont(mineFont.deriveFont(12f));
-                board[row][col].setBorder(BorderFactory.createBevelBorder(0));
-                board[row][col].setFocusPainted(false);
-                board[row][col].addMouseListener(this);
-                boardPanel.add(board[row][col]);
+        board = new JToggleButton[row][col];
+
+        boardPanel.setLayout(new GridLayout(row, col));
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < col; c++) {
+                board[r][c] = new JToggleButton();
+                board[r][c].putClientProperty("row", r);
+                board[r][c].putClientProperty("col", c);
+                board[r][c].putClientProperty("state", 0);
+                board[r][c].setBorder(BorderFactory.createBevelBorder(0));
+                board[r][c].setFocusPainted(false);
+                board[r][c].setFont(mineFont.deriveFont(16f));
+                board[r][c].addMouseListener(this);
+                boardPanel.add(board[r][c]);
             }
         }
-        this.setSize(c * 40, r * 40);
+
+        JButton resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> {
+            timer.cancel();
+            createBoard(10, 10);
+        });
+
+        JMenuBar menubar = new JMenuBar();
+        statLabel = new JTextField("Time (in seconds):", 16);
+        statLabel.setEnabled(false);
+        menubar.add(statLabel);
+        menubar.add(resetButton);
+        JMenu menu1 = new JMenu("Difficulty");
+        menubar.add(menu1);
+        JMenuItem easy = new JMenuItem("Easy");
+        menu1.add(easy);
+        easy.addActionListener(e -> {
+            numMines = 10;
+            createBoard(9, 9);
+        });
+
+        JMenuItem medium = new JMenuItem("Medium");
+        menu1.add(medium);
+        medium.addActionListener(e -> {
+            numMines = 40;
+            createBoard(16, 16);
+        });
+
+        JMenuItem hard = new JMenuItem("Hard");
+        menu1.add(hard);
+        hard.addActionListener(e -> {
+            numMines = 99;
+            createBoard(16, 40);
+        });
+
         this.add(boardPanel);
+        this.setJMenuBar(menubar);
+        this.setSize(col * 40, row * 40);
         this.revalidate();
     }
 
-    public void mouseReleased(MouseEvent e) {
-        JToggleButton btn = ((JToggleButton) e.getComponent());
-        int r = (int) (btn.getClientProperty("row"));
-        int c = (int) (btn.getClientProperty("col"));
-
-        if (e.getButton() == MouseEvent.BUTTON1) { // Left Click'
-            board[r][c].setBackground(Color.LIGHT_GRAY);
-            board[r][c].setOpaque(true);
-            if (firstClick) {
-                setBoard(r, c);
-                firstClick = false;
-            }
-
-            int state = (int) board[r][c].getClientProperty("state");
-            write(r, c, state);
-            if (state == -1) {
-                board[r][c].setIcon(mineIcon);
-                JOptionPane.showMessageDialog(null, "Your a loser!");
-                // board[row][col].setBackground(Color.RED)
-                // flip over the mine location
-            } else {
-                expand(r, c);
-                checkWin();
+    public void setMinesAndCounts(int row, int col) {
+        int count = numMines;
+        int dimR = board.length;
+        int dimC = board[0].length;
+        while (count > 0) {
+            int randR = (int) (Math.random() * dimR);
+            int randC = (int) (Math.random() * dimC);
+            int state = (int) (board[randR][randC].getClientProperty("state"));
+            if (state == 0 && Math.abs(row - randR) > 1 || Math.abs(col - randC) > 1) {
+                board[randR][randC].putClientProperty("state", 9);
+                count--;
             }
         }
-    }
 
-    public void write(int r, int c, int state) {
-        Color color = Color.BLUE;
-
-        switch (state) {
-        // case 1: board[r][c].setForeground(color); break;
-        case 2:
-            color = Color.GREEN;
-        case 3:
-            color = Color.RED;
-        case 4:
-            color = new Color(128, 0, 128);
-        case 5:
-            color = new Color(128, 0, 0);
-        case 6:
-            color = Color.CYAN;
-        case 7:
-            color = Color.MAGENTA;
-        case 8:
-            color = Color.GRAY;
-        }
-
-        if (state > 0) {
-            board[r][c].setForeground(color);
-            board[r][c].setText("" + state);
-        }
-
-    }
-
-    public void expand(int r, int c) {
-        int state = (int) board[r][c].getClientProperty("state");
-        if (state > 0) {
-            board[r][c].setText("" + state);
-        } else {
-            for (int r33 = r - 1; r33 <= r + 1; r33++) {
-                for (int c33 = c - 1; c33 <= c + 1; c33++) {
-                    try {
-                        if (!board[r33][c33].isSelected())
-                            expand(r33, c33);
-                    } catch (ArrayIndexOutOfBoundsException e) {
-
+        for (int r = 0; r < dimR; r++) {
+            for (int c = 0; c < dimC; c++) {
+                int mineCount = 0;
+                int state = (int) (board[r][c].getClientProperty("state"));
+                if (state != 9) {
+                    for (int rSmall = r - 1; rSmall <= r + 1; rSmall++) {
+                        for (int cSmall = c - 1; cSmall <= c + 1; cSmall++) {
+                            try {
+                                state = (int) (board[rSmall][cSmall].getClientProperty("state"));
+                                if (state == 9 && !(rSmall == r && cSmall == c)) {
+                                    mineCount++;
+                                }
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                            }
+                        }
                     }
+                    board[r][c].putClientProperty("state", mineCount);
+                }
+            }
+        }
+
+        /*
+         * for (int i = 0, boardLength = board.length; i < boardLength; i++) {
+         * JToggleButton[] jToggleButtons = board[i]; for (int c = 0; c < dimC; c++) {
+         * int state = (int) (jToggleButtons[c]).getClientProperty("state");
+         * jToggleButtons[c].setText("" + state);
+         *
+         * } }
+         */
+    }
+
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    public void write(int row, int col, int state) {
+        switch (state) {
+        case 1:
+            board[row][col].setIcon(image1);
+            break;
+        case 2:
+            board[row][col].setIcon(image2);
+            break;
+        case 3:
+            board[row][col].setIcon(image3);
+            break;
+        case 4:
+            board[row][col].setIcon(image4);
+            break;
+        case 5:
+            board[row][col].setIcon(image5);
+            break;
+        case 6:
+            board[row][col].setIcon(image6);
+            break;
+        case 7:
+            board[row][col].setIcon(image7);
+            break;
+        case 8:
+            board[row][col].setIcon(image8);
+            break;
+        case 9:
+            board[row][col].setIcon(image_mine);
+            break;
+        }
+        /*
+         * if (state != 0) board[row][col].setText("" + state);
+         */
+    }
+
+    public class UpdateTimer extends TimerTask {
+
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            timePassed++;
+            timeField = String.valueOf(timePassed);
+            System.out.println(timePassed);
+            statLabel.setText("Time: " + timePassed);
+        }
+
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        if (!endGame) {
+            int row = (int) (((JToggleButton) e.getComponent()).getClientProperty("row"));
+            int col = (int) (((JToggleButton) e.getComponent()).getClientProperty("col"));
+
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                board[row][col].setBackground(Color.LIGHT_GRAY);
+                board[row][col].setOpaque(true);
+                if (firstClick) {
+                    timer = new Timer();
+                    timer.schedule(new UpdateTimer(), 0, 1000);
+                    setMinesAndCounts(row, col);
+                    firstClick = false;
+                }
+                int state = (int) (((JToggleButton) e.getComponent()).getClientProperty("state"));
+                if (state == 9) {
+                    for (int r = 0; r < 10; r++) {
+                        for (int c = 0; c < 10; c++) {
+                            board[r][c].setEnabled(false);
+                        }
+                    }
+                    board[row][col].setIcon(image_mine);
+                    endGame = true;
+                    timer.cancel();
+                    JOptionPane.showMessageDialog(null, "You lost in " + timeField + " seconds");
+                } else {
+                    expand(row, col);
+                    checkWin();
+                }
+            }
+
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                if (board[row][col].getIcon() == image_flag) {
+                    board[row][col].setIcon(null);
+                } else {
+                    board[row][col].setIcon(image_flag);
                 }
             }
         }
@@ -138,62 +300,58 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         int dimC = board[0].length;
         int totalSpaces = dimR * dimC;
         int count = 0;
+
         for (int r = 0; r < dimR; r++) {
             for (int c = 0; c < dimC; c++) {
                 int state = (int) board[r][c].getClientProperty("state");
-                if (board[r][c].isSelected() && state != -1)
+                if (state != 9 && board[r][c].isSelected())
                     count++;
             }
         }
-
-        if (numMines == totalSpaces - count)
-            JOptionPane.showMessageDialog(null, "Your a Winner");
-    }
-
-    public void setBoard(int currRow, int currCol) {
-        int count = numMines;
-        int dimR = board.length;
-        int dimC = board[0].length;
-        while (count > 0) {
-            int randR = (int) (Math.random() * dimR);
-            int randC = (int) (Math.random() * dimC);
-            int state = (int) board[randR][randC].getClientProperty("state");
-            if (state == 0 && (Math.abs(currRow - randR) > 1 || Math.abs(currCol - randC) > 1)) {
-                board[randR][randC].putClientProperty("state", -1);
-                count--;
-            }
-        }
-
-        for (int r = 0; r < dimR; r++) {
-            for (int c = 0; c < dimC; c++) {
-                int state = (int) board[r][c].getClientProperty("state");
-                board[r][c].setText("" + state);
-            }
+        if (numMines == totalSpaces - count) {
+            timer.cancel();
+            JOptionPane.showMessageDialog(null, "You Win!!");
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void expand(int row, int col) {
+        if (!board[row][col].isSelected() && !endGame)
+            board[row][col].setSelected(true);
+        int state = (int) board[row][col].getClientProperty("state");
+        if (state > 0) {
+            write(row, col, state);
+        } else {
+            for (int rSmall = row - 1; rSmall <= row + 1; rSmall++) {
+                for (int cSmall = col - 1; cSmall <= col + 1; cSmall++) {
+                    try {
+                        if (!board[rSmall][cSmall].isSelected()) {
+                            expand(rSmall, cSmall);
+                        }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                    }
 
-    }
-
-    public static void main(String[] args) {
-        new Minesweeper();
+                }
+            }
+        }
     }
 
     public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated
     }
 
     public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated
     }
 
     public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated
     }
 
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated
     }
 
+    public static void main(String[] args) {
+        Minesweeper app = new Minesweeper();
+    }
 }
