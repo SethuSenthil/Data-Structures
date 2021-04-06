@@ -7,6 +7,11 @@ import java.util.*;
 
 public class GUI extends JPanel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4414985178823852569L;
+
     private JFrame frame;
 
     private JPanel panel;
@@ -28,7 +33,7 @@ public class GUI extends JPanel {
     private Font origFont;
 
     public GUI() {
-        frame = new JFrame("GUI Task");
+        frame = new JFrame("GUI");
         frame.setSize(1200, 800);
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,18 +62,16 @@ public class GUI extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     switch (direction) {
-                        case "North":
-                        case "South":
-                            panel.setLayout(new GridLayout(1, 2));
-                            buttonPanel.setLayout(new GridLayout(1, 4));
-                            menuBar.setLayout(new GridLayout(1, 0));
-                            break;
-                        case "West":
-                        case "East":
-                            panel.setLayout(new GridLayout(2, 1));
-                            buttonPanel.setLayout(new GridLayout(4, 1));
-                            menuBar.setLayout(new GridLayout(0, 1));
-                            break;
+                    case "South":
+                        panel.setLayout(new GridLayout(1, 2));
+                        buttonPanel.setLayout(new GridLayout(1, 4));
+                        menuBar.setLayout(new GridLayout(1, 0));
+                        break;
+                    case "East":
+                        panel.setLayout(new GridLayout(2, 1));
+                        buttonPanel.setLayout(new GridLayout(4, 1));
+                        menuBar.setLayout(new GridLayout(0, 1));
+                        break;
                     }
                     frame.remove(panel);
                     frame.add(panel, direction);
@@ -76,8 +79,10 @@ public class GUI extends JPanel {
                 }
 
             });
+
             buttonPanel.add(button);
         }
+
         boolean first = true;
         for (String menuInfo : menuList) {
             String[] arr = menuInfo.split("\t");
@@ -103,17 +108,18 @@ public class GUI extends JPanel {
                 item.setForeground(color == null ? Color.BLACK : color);
                 menu.add(item);
             }
-            JTextField textField = new JTextField("");
-            textField.addActionListener(new ActionListener() {
+
+            JTextField txtbox = new JTextField("");
+            txtbox.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     setParamFromMenu(arr[0], e.getActionCommand());
-                    textField.setText("");
+                    txtbox.setText("");
                 }
 
             });
-            menu.add(textField);
+            menu.add(txtbox);
             menuBar.add(menu);
         }
 
@@ -160,6 +166,7 @@ public class GUI extends JPanel {
         for (Component component : buttonPanel.getComponents()) {
             ((JButton) component).setBorder(border2);
         }
+
         resetButton.setBorder(border2);
 
         menuBar.add(resetButton);
@@ -179,49 +186,49 @@ public class GUI extends JPanel {
 
     public void setParamFromMenu(String key, String val) {
         switch (key) {
-            case "Font":
-                fontName = val;
-                for (Component component : buttonPanel.getComponents())
-                    component.setFont(new Font(val, component.getFont().getStyle(), component.getFont().getSize()));
-                for (Component component : menuBar.getComponents()) {
-                    component.setFont(new Font(val, component.getFont().getStyle(), component.getFont().getSize()));
-                    if (component instanceof JMenu && !((JMenu) component).getText().equals("Font")) {
-                        JMenu menu = (JMenu) component;
-                        for (int i = 0; i < menu.getItemCount(); i++) {
-                            JMenuItem item = menu.getItem(i);
-                            if (item != null)
-                                item.setFont(new Font(val, item.getFont().getStyle(), item.getFont().getSize()));
-                        }
+        case "Font":
+            fontName = val;
+            for (Component component : buttonPanel.getComponents())
+                component.setFont(new Font(val, component.getFont().getStyle(), component.getFont().getSize()));
+            for (Component component : menuBar.getComponents()) {
+                component.setFont(new Font(val, component.getFont().getStyle(), component.getFont().getSize()));
+                if (component instanceof JMenu && !((JMenu) component).getText().equals("Font")) {
+                    JMenu menu = (JMenu) component;
+                    for (int i = 0; i < menu.getItemCount(); i++) {
+                        JMenuItem item = menu.getItem(i);
+                        if (item != null)
+                            item.setFont(new Font(val, item.getFont().getStyle(), item.getFont().getSize()));
                     }
                 }
-                resetButton.setFont(new Font(val, resetButton.getFont().getStyle(), resetButton.getFont().getSize()));
-                break;
-            case "Font Size":
-                if (val.matches("\\d+"))
-                    fontSize = Integer.parseInt(val);
-                break;
-            case "Font Style":
-                fontStyle = toFontStyle(val);
-                break;
-            case "Text Color":
-                textArea.setForeground(toColor(val));
-                break;
-            case "BG Color":
-                textArea.setBackground(toColor(val));
-                break;
-            case "Border Color":
-                Border border;
-                if (val.equals("None")) {
-                    border = border2;
-                } else {
-                    LineBorder border1 = new LineBorder(toColor(val));
-                    border = BorderFactory.createCompoundBorder(border1, border2);
-                }
-                for (Component component : buttonPanel.getComponents()) {
-                    ((JButton) component).setBorder(border);
-                }
-                resetButton.setBorder(border);
-                break;
+            }
+            resetButton.setFont(new Font(val, resetButton.getFont().getStyle(), resetButton.getFont().getSize()));
+            break;
+        case "Font Size":
+            if (val.matches("\\d+"))
+                fontSize = Integer.parseInt(val);
+            break;
+        case "Font Style":
+            fontStyle = toFontStyle(val);
+            break;
+        case "Text Color":
+            textArea.setForeground(toColor(val));
+            break;
+        case "BG Color":
+            textArea.setBackground(toColor(val));
+            break;
+        case "Border Color":
+            Border border;
+            if (val.equals("None")) {
+                border = border2;
+            } else {
+                LineBorder border1 = new LineBorder(toColor(val));
+                border = BorderFactory.createCompoundBorder(border1, border2);
+            }
+            for (Component component : buttonPanel.getComponents()) {
+                ((JButton) component).setBorder(border);
+            }
+            resetButton.setBorder(border);
+            break;
         }
         updateFont();
     }

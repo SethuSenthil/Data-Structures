@@ -33,7 +33,6 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
     private static final long serialVersionUID = 1L;
     JToggleButton[][] board;
     JPanel boardPanel;
-    JPanel rootPanel;
     ImageIcon image1, image2, image3, image4, image5, image6, image7, image8, image_mine, image_flag;
     boolean firstClick = true;
     int numMines;
@@ -97,6 +96,10 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
     }
 
     public void createBoard(int row, int col) {
+        // reset Stuff
+        timePassed = 0;
+        endGame = false;
+
         if (boardPanel != null)
             this.remove(boardPanel);
         boardPanel = new JPanel();
@@ -120,6 +123,8 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> {
             timer.cancel();
+            numMines = 10;
+            boardPanel = null;
             createBoard(10, 10);
         });
 
@@ -134,6 +139,7 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         menu1.add(easy);
         easy.addActionListener(e -> {
             numMines = 10;
+            boardPanel = null;
             createBoard(9, 9);
         });
 
@@ -141,6 +147,7 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         menu1.add(medium);
         medium.addActionListener(e -> {
             numMines = 40;
+            boardPanel = null;
             createBoard(16, 16);
         });
 
@@ -148,6 +155,7 @@ public class Minesweeper extends JFrame implements ActionListener, MouseListener
         menu1.add(hard);
         hard.addActionListener(e -> {
             numMines = 99;
+            boardPanel = null;
             createBoard(16, 40);
         });
 
